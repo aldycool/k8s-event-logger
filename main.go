@@ -1,17 +1,17 @@
 package main
 
 import (
-	"encoding/json"
 	"fmt"
-	"k8s.io/api/core/v1"
+	"os"
+	"os/user"
+	"time"
+
+	v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/fields"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/cache"
 	"k8s.io/client-go/tools/clientcmd"
-	"os"
-	"os/user"
-	"time"
 )
 
 func main() {
@@ -61,8 +61,10 @@ func main() {
 		0,
 		cache.ResourceEventHandlerFuncs{
 			AddFunc: func(obj interface{}) {
-				j, _ := json.Marshal(obj)
-				fmt.Printf("%s\n", string(j))
+				event, ok := obj.(*v1.Event)
+				if ok {
+					fmt.Printf("[k8s-event-logger] Namespace: %s, Kind: %s, Name: %s, Type: %s, Reason: %s, Message: %s\n", event.InvolvedObject.Namespace, event.InvolvedObject.Kind, event.InvolvedObject.Name, event.Type, event.Reason, event.Message)
+				}
 			},
 		},
 	)
@@ -74,4 +76,11 @@ func main() {
 		time.Sleep(time.Second)
 	}
 
+}
+
+// For tricking the annoying "declared but not used", use: Use(var1, var2, var3 ...)
+func Use(vals ...interface{}) {
+	for _, val := range vals {
+		_ = val
+	}
 }
