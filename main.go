@@ -23,7 +23,7 @@ func main() {
 	var config *rest.Config
 
 	if k8s_port := os.Getenv("KUBERNETES_PORT"); k8s_port == "" {
-		fmt.Println("Using local kubeconfig")
+		// fmt.Println("Using local kubeconfig") // Disable all non-compatible printout
 		var kubeconfig string
 		home := usr.HomeDir
 		if home != "" {
@@ -37,7 +37,7 @@ func main() {
 			panic(err.Error())
 		}
 	} else {
-		fmt.Println("Using in cluster authentication")
+		// fmt.Println("Using in cluster authentication") // Disable all non-compatible printout
 		config, err = rest.InClusterConfig()
 		if err != nil {
 			panic(err.Error())
